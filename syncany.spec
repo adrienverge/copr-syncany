@@ -1,18 +1,18 @@
+%define versiondate 20201028
+
 Name:           syncany
 Version:        0.4.9
-Release:        1%{?dist}
+Release:        %{versiondate}%{?dist}
 Summary:        An open-source cloud storage and filesharing application
 
 License:        GPLv3
 URL:            https://www.syncany.org/
 
-# https://github.com/syncany/syncany/releases/download/v0.4.9-alpha/\
-# syncany-0.4.9-alpha.tar.gz
-Source0:        %{name}-%{version}-alpha.tar.gz
+Source0:        %{name}-%{version}-%{versiondate}.zip
 
 BuildArch: noarch
 
-Requires: java-headless
+BuildRequires: java-devel
 
 %description
 Syncany allows users to securely backup and share certain folders of their
@@ -20,14 +20,18 @@ computers using any kind of storage. Syncany is open-source and provides data
 encryption and incredible flexibility in terms of storage type and provider.
 
 %prep
-%setup -q -n %{name}-%{version}-alpha
+%setup -q -n %{name}-develop
+./gradlew
+
+%build
+./gradlew installDist
 
 %install
 mkdir -p %{buildroot}%{_javadir}/syncany/bin
-install -p -m 755 bin/sy %{buildroot}%{_javadir}/syncany/bin
-install -p -m 755 bin/syncany %{buildroot}%{_javadir}/syncany/bin
+install -p -m 755 build/install/syncany/bin/sy %{buildroot}%{_javadir}/syncany/bin
+install -p -m 755 build/install/syncany/bin/syncany %{buildroot}%{_javadir}/syncany/bin
 mkdir -p %{buildroot}%{_javadir}/syncany/lib
-install -p lib/*.jar %{buildroot}%{_javadir}/syncany/lib
+install -p build/install/syncany/lib/* %{buildroot}%{_javadir}/syncany/lib
 
 mkdir -p %{buildroot}%{_bindir}
 ln -s ../..%{_javadir}/syncany/bin/sy %{buildroot}%{_bindir}/sy
@@ -36,11 +40,16 @@ ln -s ../..%{_javadir}/syncany/bin/syncany %{buildroot}%{_bindir}/syncany
 %files
 %{_bindir}/sy
 %{_bindir}/syncany
+%{_javadir}/syncany
 %{_javadir}/syncany/bin/sy
 %{_javadir}/syncany/bin/syncany
-%{_javadir}/syncany/lib/*.jar
+%{_javadir}/syncany/lib/syncany-develop.jar
 
 %changelog
+* Wed Oct 28 2020 Adrien Vergé <adrienverge@gmail.com> - 0.4.9-20201028
+- Return to Gradle packaging (no precompiled package).
+- Update to latest Git version (3fe40bb) to support Java 11.
+
 * Mon Apr 30 2018 Adrien Vergé <adrienverge@gmail.com> - 0.4.9-1
 - Update to latest upstream version.
 - Use precompiled package from GitHub, because building on Fedora 28 fails.

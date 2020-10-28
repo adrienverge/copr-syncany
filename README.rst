@@ -20,3 +20,13 @@ Installation
 
  sudo dnf copr enable adrienverge/syncany
  sudo dnf install syncany
+
+Hacking around
+--------------
+
+.. code:: shell
+
+ rpmbuild -bs syncany.spec && \
+ mock -r fedora-33-x86_64 \
+      --enable-network \
+      rebuild ~/rpmbuild/SRPMS/syncany-*.src.rpm
